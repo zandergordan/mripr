@@ -22,7 +22,6 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
   endyr<-as.character(endyr)
   wave<-as.character(c(1,2,3,4,5,6))
   dom_id<-NULL
-  dataset<-NULL
   temp<-NULL
   temp1<-NULL
  rbind2<- function(input1, input2){
@@ -85,7 +84,6 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
           names(dataset)[ncol(dataset)]<- paste0(names(dom)[l], "1")
           colpos<-which(names(dataset)==names(dom[l]))
            sublev<-length(dom[[l]])
-        k<-1
          for (k in 1:sublev){  
          dataset[,ncol(dataset)]<-ifelse(dataset[,colpos] %in% as.character(dom[[l]][[k]]), paste0(names(dom)[l], k), dataset[, ncol(dataset)])
          }   
