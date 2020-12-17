@@ -59,8 +59,7 @@ calculate_catch <- function(
       wv <- wave[j]
       t3 <- read.csv(
         paste0(din, yr, "/", "catch_", yr, wv, ".csv"),
-        colClasses = "character",
-        na.strings = "../../../../Downloads/MRIP Catch Estimation Program Template in R"
+        colClasses = "character"
       )
       t3 <- t3[t3$ST %in% st, ]
       names(t3) <- tolower(names(t3))
@@ -68,8 +67,7 @@ calculate_catch <- function(
       # Get trips
       t4 <- read.csv(
         paste0(din, yr, "/", "trip_", yr, wv, ".csv"),
-        colClasses = "character",
-        na.strings = "../../../../Downloads/MRIP Catch Estimation Program Template in R"
+        colClasses = "character"
       )
       t4 <- t4[t4$ST %in% st, ]
       names(t4) <- tolower(names(t4))
