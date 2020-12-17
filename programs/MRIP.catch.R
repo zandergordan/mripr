@@ -1,3 +1,5 @@
+library(survey)
+
 MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
    endyr=NULL,dom=NULL){
     if(is.null(intdir)) stop("Need main directory location of intercept files.")
