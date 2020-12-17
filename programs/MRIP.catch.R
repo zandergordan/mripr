@@ -7,11 +7,11 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
     # If species equal NULL all species are used.
   if(length(grep("/",intdir))==1){
         din<-ifelse(substr(intdir,nchar(intdir),nchar(intdir)) %in% "/",
-                    paste(intdir,"int",sep=""), paste(intdir, "/int", sep=""))
+                    paste0(intdir, "int"), paste0(intdir, "/int"))
      }
     if(length(grep("\\\\",intdir))==1){
         din<-ifelse(substr(intdir,nchar(intdir),nchar(intdir)) %in% "\\",
-                    paste(intdir,"int",sep=""), paste(intdir, "\\int", sep=""))
+                    paste0(intdir, "int"), paste0(intdir, "\\int"))
      }
   
   if(!is.null(common)) common<-tolower(common)
@@ -43,13 +43,13 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
  	   for (j in 1:as.numeric(length(wave))){ 
              #Get catch
       	     wv<-wave[j] 
-             t3<-read.csv(paste(din,yr,"/","catch_",yr,wv,".csv",sep=""),
+             t3<-read.csv(paste0(din, yr, "/", "catch_", yr, wv, ".csv"),
                           colClasses= "character", na.strings= "../../../../Downloads/MRIP Catch Estimation Program Template in R")
                t3<-t3[t3$ST %in% st,]
                names(t3)<-tolower(names(t3))
                temp<-rbind2(temp,t3)
       #get trips
-             t4<-read.csv(paste(din,yr,"/","trip_",yr,wv,".csv",sep=""),
+             t4<-read.csv(paste0(din, yr, "/", "trip_", yr, wv, ".csv"),
                           colClasses= "character", na.strings= "../../../../Downloads/MRIP Catch Estimation Program Template in R")
              t4<-t4[t4$ST %in% st,]
               names(t4)<-tolower(names(t4))
@@ -80,47 +80,46 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
       if (!any(names(dom)[l]==names(dataset))) stop(paste("Variable ",names(dom[l]),"not found in MRIP dataset"))
       if (any(names(dom)[l]==names(dataset))){
           dataset[,ncol(dataset)+1]<-"DELETE"
-          names(dataset)[ncol(dataset)]<- paste(names(dom)[l], "1", sep="")
+          names(dataset)[ncol(dataset)]<- paste0(names(dom)[l], "1")
           colpos<-which(names(dataset)==names(dom[l]))
            sublev<-length(dom[[l]])
         k<-1
          for (k in 1:sublev){  
-         dataset[,ncol(dataset)]<-ifelse(dataset[,colpos] %in% as.character(dom[[l]][[k]]), paste(names(dom)[l], k, sep=""), dataset[, ncol(dataset)])
+         dataset[,ncol(dataset)]<-ifelse(dataset[,colpos] %in% as.character(dom[[l]][[k]]), paste0(names(dom)[l], k), dataset[, ncol(dataset)])
          }   
            dom_ids<-c(dom_ids,names(dom[l]))   
       }
     }
     test<-c("year","wave","st","sub_reg","mode_fx","area_x")
     for(gg in 1:as.numeric(length(dom_ids))){
-      if(!any(dom_ids[gg]==test)) test[as.numeric(length(test)+1)]<- paste(dom_ids[gg], "1", sep="")
+      if(!any(dom_ids[gg]==test)) test[as.numeric(length(test)+1)]<- paste0(dom_ids[gg], "1")
       if(any(dom_ids[gg]==test)){
         colpos<-which(test==dom_ids[gg])
-        test[colpos]<- paste(dom_ids[gg], "1", sep="")
+        test[colpos]<- paste0(dom_ids[gg], "1")
       }
     }
    
     ## add Non-domain names to values in columns
       for(gg in 1:as.numeric(length(test))){
         if(substr(test[gg],nchar(test[gg]),nchar(test[gg]))!="1"){
-          eval(parse(text=paste("dataset$",test[gg],'<-paste("',as.character(test[gg]),'",dataset$',test[gg],',sep="")',sep="")))
+          eval(parse(text= paste0("dataset$", test[gg], '<-paste("', as.character(test[gg]), '",dataset$', test[gg], ',sep="")')))
         }
       }
    for(hh in 1:as.numeric(length(test))){
-     if(hh==1) texter<-paste("dataset$",test[hh],sep="") 
-     if(hh>1) texter<-paste(texter,",","dataset$",test[hh],sep="")  
+     if(hh==1) texter<- paste0("dataset$", test[hh])
+     if(hh>1) texter<- paste0(texter, ",", "dataset$", test[hh])
    }
-     eval(parse(text=paste("dataset$dom_id<-c(paste(",texter,",sep=''))",sep="")))
+     eval(parse(text= paste0("dataset$dom_id<-c(paste(", texter, ",sep=''))")))
   }# dom>0 
  
   if(length(dom)==0){
-   dataset$year<- paste("year", dataset$year, sep="")
-   dataset$wave<- paste("wave", dataset$wave, sep="")
-   dataset$st<- paste("st", dataset$st, sep="")
-   dataset$sub_reg<- paste("sub_reg", dataset$sub_reg, sep="")
-   dataset$mode_fx<- paste("mode_fx", dataset$mode_fx, sep="")
-   dataset$area_x<- paste("area_x", dataset$area_x, sep="")
-   dataset$dom_id<- paste(dataset$year, dataset$wave, dataset$st, dataset$sub_reg,
-                          dataset$mode_fx, dataset$area_x, sep="")
+   dataset$year<- paste0("year", dataset$year)
+   dataset$wave<- paste0("wave", dataset$wave)
+   dataset$st<- paste0("st", dataset$st)
+   dataset$sub_reg<- paste0("sub_reg", dataset$sub_reg)
+   dataset$mode_fx<- paste0("mode_fx", dataset$mode_fx)
+   dataset$area_x<- paste0("area_x", dataset$area_x)
+   dataset$dom_id<- paste0(dataset$year, dataset$wave, dataset$st, dataset$sub_reg, dataset$mode_fx, dataset$area_x)
   }
   dataset$tot_cat<-as.numeric(dataset$tot_cat)
   dataset$landing<-as.numeric(dataset$landing)
@@ -139,7 +138,7 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
   dataset$dharvest<-ifelse(dataset$common==common,dataset$harvest,0)
   dataset$drelease<-ifelse(dataset$common==common,dataset$release,0)
   dataset$dwgt_ab1<-ifelse(dataset$common==common,dataset$wgt_ab1,0)
-  dataset$dom_id<- paste(dataset$dom_id, common, sep="")
+  dataset$dom_id<- paste0(dataset$dom_id, common)
   dataset1<-aggregate(cbind(dataset$dtotcat,dataset$dlandings,dataset$dclaim,dataset$dharvest,
   dataset$drelease,dataset$dwgt_ab1)
      ,list(dataset$strat_id,dataset$psu_id,dataset$id_code,dataset$wp_int,dataset$dom_id),sum)
@@ -160,7 +159,7 @@ MRIP.catch<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
    }
   }
   if(is.null(common)){
-    dataset$dom_id<- paste(dataset$dom_id, dataset$common, sep="")
+    dataset$dom_id<- paste0(dataset$dom_id, dataset$common)
     dfpc<-svydesign(ids=~psu_id,strata=~strat_id,
     weights=~wp_int,nest=TRUE,data=dataset)
     options(survey.lonely.psu = "certainty")
