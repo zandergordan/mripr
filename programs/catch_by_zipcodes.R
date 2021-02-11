@@ -2,7 +2,7 @@ library(stringr)
 library(survey)
 options(survey.lonely.psu="certainty")
 
-getwd()
+get
 
 #Load SE MRIP data
 #trips: Wave 6 private boat trips to Florida

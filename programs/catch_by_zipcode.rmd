@@ -1,0 +1,37 @@
+---
+title: "Catch by ZIP"
+author: "Zander Gordan"
+date: "2/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document will adapt David Carter's code to generate catch by zipcode estimates from the MRIP data. The provided script does not run with current libraries in this project.
+
+First, loading the libraries:
+
+```{r}
+library(stringr)
+library(survey)
+options(survey.lonely.psu="certainty")
+```
+
+Then loading the MRIP data provided by David, which also came with the following comments:
+
+```
+#trips: Wave 6 private boat trips to Florida
+#catch: Wave 6 private boat trips to West Florida that caught (A+B1+B2) gag
+```
+
+```{r}
+trips=readRDS("../data/clean_data/trips.rds")
+catch=readRDS("../data/clean_data/catch.rds")
+```
+
+```{r}
+2+2
+```
+
