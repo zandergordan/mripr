@@ -2,8 +2,6 @@ library(stringr)
 library(survey)
 options(survey.lonely.psu="certainty")
 
-get
-
 #Load SE MRIP data
 #trips: Wave 6 private boat trips to Florida
 #catch: Wave 6 private boat trips to West Florida that caught (A+B1+B2) gag

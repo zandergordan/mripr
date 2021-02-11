@@ -16,6 +16,7 @@ First, loading the libraries:
 ```{r}
 library(stringr)
 library(survey)
+library(tidyverse)
 options(survey.lonely.psu="certainty")
 ```
 
@@ -27,11 +28,151 @@ Then loading the MRIP data provided by David, which also came with the following
 ```
 
 ```{r}
-trips=readRDS("../data/clean_data/trips.rds")
-catch=readRDS("../data/clean_data/catch.rds")
+trips <- readRDS("../data/clean_data/trips.rds")
+catch <- readRDS("../data/clean_data/catch.rds")
 ```
 
+The FIPS codes need to be zero-padded and joined together, and we can also make an indicator for living in Florida:
+
 ```{r}
-2+2
+trips <- trips %>% 
+  mutate(
+    FIPS = paste0(str_pad(ST_RES, 2, pad = "0"), str_pad(CNTY_RES, 3, pad="0")),
+    FL_RES = (ST_RES == "12")
+  )
 ```
+
+We can now join the catch data to the trips data:
+
+```{r}
+ trips <- trips %>% 
+   left_join(catch %>% select(ID_CODE, wp_catch, tot_cat), by = "ID_CODE")
+```
+
+Though in fact, this is unnecessary because the `trips.rds` provided already had this information.
+
+Since the catch data only contained records for trips with positive catch of Gag grouper, we need to set the catch to 0 for the columns in which it is missing:
+
+```{r}
+trips <- trips %>% 
+  mutate(
+    tot_cat = if_else(is.na(tot_cat), 0, tot_cat)
+    )
+```
+
+The code above was also unnecessary, since it had been done in David's .rds file already, but it is good to translate the code.
+
+Next we can create an indicator variable for trips which targeted or caught gag grouper in the Gulf of Mexico (`SUB_REG == 7`):
+
+```{r}
+trips <- trips %>% 
+  mutate(
+    tgtGagGOM = SUB_REG == 7 & 
+                (prim1_common == "GAG" | prim2_common == "GAG" | tot_cat > 0)
+  )
+```
+
+Now that the data is prepared, we can move on to calculating:
+
+1. The total number of Florida private boat trips from Nov-Dec of 2005 to 2017
+2. The total catch of Gag grouper from West Florida from Nov-Dec of 2005 to 2017
+
+This code translates David's code to use the tidyverse `group_by %>% summarise` idiom:
+
+```{r}
+trips %>% 
+  group_by(YEAR) %>% 
+  summarise(TRIPS = sum(wp_int),
+            CATCH = sum(wp_int * tot_cat)
+            ) %>% 
+  pander::pander(row.names = FALSE,
+                 caption = "Florida Private Boat Trips and West Florida Catch of Gag Grouper: 2005-2017, Nov-Dec",
+                 round = 0, 
+                 big.mark = ',',
+                 justify = "center")
+```
+
+Here is the remaining code from David, which works with the ZIP-code level aggregation:
+
+```{r}
+#Counter variable
+trips$one=1
+
+#Missing zip codes after 2004; working to get codes added back
+aggregate(is.na(trips$ZIP)~YEAR,
+          FUN=sum,
+          data=trips
+          )
+
+#Count of FL resident interviews in wave 6 by zip of origin
+intsByZip <- aggregate(tot_cat~ZIP,
+                    FUN=length,
+                    data=subset(trips,FL_RES & YEAR<2004)
+                    )
+
+intsByZipByYr <- aggregate(tot_cat~ZIP+YEAR,
+                        FUN=length,
+                        data=subset(trips,FL_RES & YEAR<2004)
+                        )
+
+
+#Trips survey design object
+tripss=svydesign(id=~psu_id, 
+                 strata=~strat_id,
+                 weights=~wp_int, 
+                 data=trips)
+
+#FL resident gag total catch (2000-2004) in wave 6 by zip of origin
+catchByZipT=svyby(~one+tot_cat,
+                  ~ZIP,
+                  FUN=svytotal,
+                  design=subset(tripss,FL_RES  & YEAR<2004),
+                  vartype="ci",
+                  multicore=TRUE)
+
+#FL resident gag average catch per trip (2000-2004) in wave 6 by zip of origin
+catchByZipM=svyby(~tot_cat,
+                  ~ZIP,
+                  FUN=svymean,
+                  design=subset(tripss,FL_RES & YEAR<2004),
+                  vartype="ci",
+                  multicore=TRUE)
+```
+
+
+```{r}
+catchByZipM
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FIN
 
