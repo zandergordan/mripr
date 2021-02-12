@@ -10,6 +10,7 @@
 #' @return a dataframe with catch estimates and PSEs
 #' @export
 #'
+#'
 calculate_catch <- function(
   intdir = NULL,
   common = NULL,
