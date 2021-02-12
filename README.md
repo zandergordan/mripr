@@ -16,8 +16,8 @@ data. The package will provide the following functions:
     page](https://www.st.nmfs.noaa.gov/st1/recreational/MRIP_Survey_Data/SAS/)
     to see if any data has been modified since it was last downloaded,
     in which case the updated version is downloaded before proceeding.
--   [ ] Calculate catch and directed trip estimates, comparable to those
-    frin the [web
+-   [x] Calculate catch and directed trip estimates, comparable to those
+    from the [web
     query](https://www.fisheries.noaa.gov/data-tools/recreational-fisheries-statistics-queries)
 -   [ ] Calculate custom catch estimates using custom survey domains
 
@@ -35,9 +35,15 @@ devtools::install_github("zandergordan/mripr")
 
 This call to the `calculate_catch()` function uses the 2018 `.csv` files
 which are bundled with the package to replicate the output from the MRIP
-catch time series query tool with the following options: - `2018` to
-`2018` - `by wave` - `West Florida` - `GAG` - `all modes combined` -
-`all areas combined` - `total catch`
+catch time series query tool with the following options:
+
+-   `2018` to `2018`
+-   `by wave`
+-   `West Florida`
+-   `GAG`
+-   `all modes combined`
+-   `all areas combined`
+-   `total catch`
 
 ``` r
 library(mripr)
