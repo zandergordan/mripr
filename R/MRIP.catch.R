@@ -1,5 +1,15 @@
-library(survey)
-
+#' Calculate catch
+#'
+#' @param intdir data directory
+#' @param common species names(s)
+#' @param st The state(s)
+#' @param styr Start year
+#' @param endyr End year
+#' @param dom optional custom domain
+#'
+#' @return a dataframe with catch estimates and PSEs
+#' @export
+#'
 calculate_catch <- function(
   intdir = NULL,
   common = NULL,
@@ -57,21 +67,21 @@ calculate_catch <- function(
     for (j in 1:as.numeric(length(wave))) {
       # Get catch
       wv <- wave[j]
-      t3 <- read.csv(
+      t3 <- utils::read.csv(
         paste0(din, yr, "/", "catch_", yr, wv, ".csv"),
         colClasses = "character"
       )
       t3 <- t3[t3$ST %in% st, ]
       names(t3) <- tolower(names(t3))
-      temp <- rbind2(temp, t3)
+      temp <- methods::rbind2(temp, t3)
       # Get trips
-      t4 <- read.csv(
+      t4 <- utils::read.csv(
         paste0(din, yr, "/", "trip_", yr, wv, ".csv"),
         colClasses = "character"
       )
       t4 <- t4[t4$ST %in% st, ]
       names(t4) <- tolower(names(t4))
-      temp1 <- rbind2(temp1, t4)
+      temp1 <- methods::rbind2(temp1, t4)
     }
   }
   convtolow <- function(x) {
@@ -188,7 +198,7 @@ calculate_catch <- function(
     dataset$drelease <- ifelse(dataset$common == common, dataset$release, 0)
     dataset$dwgt_ab1 <- ifelse(dataset$common == common, dataset$wgt_ab1, 0)
     dataset$dom_id <- paste0(dataset$dom_id, common)
-    dataset1 <- aggregate(
+    dataset1 <- stats::aggregate(
       cbind(
         dataset$dtotcat, dataset$dlandings, dataset$dclaim, dataset$dharvest,
         dataset$drelease, dataset$dwgt_ab1
@@ -199,16 +209,16 @@ calculate_catch <- function(
       "strat_id", "psu_id", "id_code", "wp_int", "dom_id", "total.catch",
       "harvest.A.B1", "claim.A", "reported.B1", "released.B2", "weight"
     )
-    dfpc <- svydesign(
+    dfpc <- survey::svydesign(
       ids = ~psu_id, strata = ~strat_id,
       weights = ~wp_int, nest = TRUE, data = dataset1
     )
     options(survey.lonely.psu = "certainty")
-    results <- svyby(
+    results <- survey::svyby(
       ~ total.catch + harvest.A.B1 + claim.A + reported.B1 + released.B2 + weight,
       ~dom_id,
       dfpc,
-      svytotal,
+      survey::svytotal,
       vartype = c("se", "cv"),
       keep.names = FALSE
     )
@@ -226,13 +236,13 @@ calculate_catch <- function(
   }
   if (is.null(common)) {
     dataset$dom_id <- paste0(dataset$dom_id, dataset$common)
-    dfpc <- svydesign(
+    dfpc <- survey::svydesign(
       ids = ~psu_id, strata = ~strat_id,
       weights = ~wp_int, nest = TRUE, data = dataset
     )
     options(survey.lonely.psu = "certainty")
-    results <- svyby(~ tot_cat + landing + claim + harvest + release + wgt_ab1,
-      ~dom_id, dfpc, svytotal,
+    results <- survey::svyby(~ tot_cat + landing + claim + harvest + release + wgt_ab1,
+      ~dom_id, dfpc, survey::svytotal,
       vartype = c("se", "cv"), keep.names = FALSE
     )
     names(results) <- c(

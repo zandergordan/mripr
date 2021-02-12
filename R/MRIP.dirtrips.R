@@ -1,3 +1,16 @@
+#' Calculate directed trips
+#'
+#' @param intdir data directory
+#' @param common species names(s)
+#' @param st The state(s)
+#' @param styr Start year
+#' @param endyr End year
+#' @param trips type of trips
+#' @param dom optional custom domain
+#'
+#' @return a dataframe with directed trip estimates and PSEs
+#' @export
+#'
 MRIP.dirtrips<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
    endyr=NULL, trips=c(1,2,3,4,5),dom=NULL){
     if(is.null(intdir)) stop("Need main directory location of intercept files.")
@@ -44,17 +57,17 @@ MRIP.dirtrips<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
  	   for (j in 1:as.numeric(length(wave))){ 
              #Get catch
       	     wv<-wave[j] 
-             t3<-read.csv(paste(din,yr,"/","catch_",yr,wv,".csv",sep=""),
+             t3<-utils::read.csv(paste(din,yr,"/","catch_",yr,wv,".csv",sep=""),
                colClasses=c("character"),na.strings= "../../../../Downloads/MRIP Direct Angler Trip Estimation Template Program in R")
                t3<-t3[t3$ST %in% c(st),]
              names(t3)<-tolower(names(t3))
-            temp<-rbind2(temp,t3)
+            temp<-methods::rbind2(temp,t3)
       #get trips
-             t4<-read.csv(paste(din,yr,"/","trip_",yr,wv,".csv",sep=""),
+             t4<-utils::read.csv(paste(din,yr,"/","trip_",yr,wv,".csv",sep=""),
               colClasses=c("character"),na.strings= "../../../../Downloads/MRIP Direct Angler Trip Estimation Template Program in R")
              t4<-t4[t4$ST %in% c(st),]
          names(t4)<-tolower(names(t4))    
-        temp1<-rbind2(temp1,t4)
+        temp1<-methods::rbind2(temp1,t4)
  	   }
 	}
   convtolow<-function(x){
@@ -131,7 +144,7 @@ MRIP.dirtrips<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
   if(trips==3){
 	subset <- dataset[which(dataset$common==common),]
 
-	maxclaim <- aggregate(claim ~ leader, subset, max)
+	maxclaim <- stats::aggregate(claim ~ leader, subset, max)
 	combined <- merge(dataset,maxclaim, by="leader", all=TRUE)
 
 	dataset <- dataset[order(dataset$leader),]
@@ -191,7 +204,7 @@ MRIP.dirtrips<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
   }
   texter1<-paste("ifelse(",temlab,",","dataset$dom_id,2)",sep="")
    eval(parse(text=paste("dataset$dom_id<-",texter1,sep="")))
-  dataset1<-aggregate(cbind(dataset$dtotcat,dataset$dlandings,dataset$dclaim,dataset$dharvest,
+  dataset1<-stats::aggregate(cbind(dataset$dtotcat,dataset$dlandings,dataset$dclaim,dataset$dharvest,
     dataset$drelease,dataset$dwgt_ab1)
     ,list(dataset$strat_id,
     dataset$psu_id,dataset$id_code,dataset$wp_int,dataset$prim1_common,dataset$prim2_common,dataset$dcomm,dataset$dom_id),sum)
@@ -199,11 +212,11 @@ MRIP.dirtrips<-function(intdir=NULL,common=NULL, st=NULL,styr=NULL,
     "harvest.A.B1","claim.A","reported.B1","released.B2","weight")
 
   dataset1$dtrip<-1
-  dfpc<-svydesign(ids=~psu_id,strata=~strat_id,
+  dfpc<-survey::svydesign(ids=~psu_id,strata=~strat_id,
    weights=~wp_int,nest=TRUE,data=dataset1)
    options(survey.lonely.psu = "certainty")
-   results<-svyby(~dtrip,
-     ~dom_id_add,dfpc,svytotal,vartype=c("se","cv"),keep.names=FALSE) 
+   results<-survey::svyby(~dtrip,
+     ~dom_id_add,dfpc,survey::svytotal,vartype=c("se","cv"),keep.names=FALSE) 
   names(results)<-c("Domain","Trips","SE","PSE")
    if(length(grep("DELETE",results$Domain,fixed=TRUE))>0){
      results<-results[-c(grep("DELETE",results$Domain,fixed=TRUE)),]
