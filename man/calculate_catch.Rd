@@ -14,11 +14,11 @@ calculate_catch(
 )
 }
 \arguments{
-\item{intdir}{data directory}
+\item{intdir}{the path and main directory (in quotes) under which raw intercept sub-directories are stored.}
 
-\item{common}{species names(s)}
+\item{common}{the common name of a species provided at the MRFSS website in quotes (e.g., "STRIPED BASS".). If common = NULL, quantities for all species are generated.}
 
-\item{st}{The state(s)}
+\item{st}{state(s) code of data to include, as an integer.  A complete list of state codes is provided at the MRFSS website. FL = 12}
 
 \item{styr}{Start year}
 
@@ -31,4 +31,16 @@ a dataframe with catch estimates and PSEs
 }
 \description{
 Calculate catch
+}
+\examples{
+calculate_catch(intdir = system.file("extdata", package = "mripr"),
+                         common = 'GAG',
+                         st = 12,
+                         styr = 2018,
+                         endyr = 2018,
+                         dom = list(mode_fx = list(c(1,2,3,4,5,7)),
+                                    area_x = list(c(1,2,3,4,5)),
+                                    sub_reg = list(c(7)))
+                        )[c("Domain", "total.catch")]
+                        
 }
