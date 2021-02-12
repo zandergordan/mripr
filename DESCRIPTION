@@ -1,5 +1,5 @@
 Package: mripr
-Title: Use MRIP data
+Title: useR interface to MRIP data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Zander",
