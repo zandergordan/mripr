@@ -1,0 +1,12 @@
+Package: mripr
+Title: Use MRIP data
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Zander",
+           family = "Gordan",
+           role = c("aut", "cre"),
+           email = "me@zandergordan.com")
+Description: The Marine Recreational Information Program maintains an extensive archive of data on recreational angling strecthing back to the 1980's. This package provides helper functions for downloading and using that data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
