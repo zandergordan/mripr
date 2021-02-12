@@ -3,3 +3,7 @@
 ^LICENSE\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^README\.Rmd$
+^R/MRIP\.catch\.Rd$
+^R/MRIP\.dirtrips\.Rd$
+^R/catch_by_zipcode\.rmd$
