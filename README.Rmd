@@ -36,9 +36,26 @@ devtools::install_github("zandergordan/mripr")
 
 ## Example
 
-examples coming soon!
+This call to the `calculate_catch()` function uses the 2018 `.csv` files which are bundled with the package to replicate the output from the MRIP catch time series query tool with the following options:
+- `2018` to `2018`
+- `by wave`
+- `West Florida`
+- `GAG`
+- `all modes combined`
+- `all areas combined`
+- `total catch`
 
 ```{r example}
 library(mripr)
-## basic example code
+
+a <- calculate_catch(intdir = system.file("extdata", package = "mripr"),
+                     common = 'GAG',
+                     st = 12,
+                     styr = 2018,
+                     endyr = 2018,
+                     dom = list(mode_fx = list(c(1,2,3,4,5,7)),
+                                area_x = list(c(1,2,3,4,5)),
+                                sub_reg = list(c(7)))
+)
+a[c("Domain", "total.catch")]
 ```
